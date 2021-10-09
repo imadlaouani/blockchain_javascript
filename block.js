@@ -7,9 +7,15 @@ class Block {
         this.timestamp = timestamp;
         this.lastHash = lastHash;
         this.hash = hash;
-        this.data = data;
+        this._data = data;
     }
-
+    set data(newData) {
+        this._data = newData;
+      }
+      
+    get data(){
+        return this._data;
+    }
     toString(){
         return `{
             timestamp : ${this.timestamp},
@@ -18,15 +24,20 @@ class Block {
             data : ${this.data}
         }`
     }
+    
+
     static genesis(){
-        return new Block("today","0000","00001","Genesis block")
+        const hash = Block.hash("today","0000","Genesis block")
+        return new Block("today","0000",hash,"Genesis block")
     }
-    static hash(timestamp, lastHash,data) {
-        return SHA256(timestamp, lastHash, data).toString()
+    static hash(timestamp,lastHash,data) {
+        return SHA256(timestamp+lastHash+data).toString()
     }
 
     static mineBlock(lastblock,data) {
-        return new Block(Date.now(),lastblock.hash,Block.hash(Date.now(),lastblock,data),data)
+        const timestamp = Date.now()
+        const hash = Block.hash(timestamp,lastblock.hash,data)
+        return new Block(timestamp,lastblock.hash,hash,data)
     }
 
 }

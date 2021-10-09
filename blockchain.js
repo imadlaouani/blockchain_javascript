@@ -9,6 +9,7 @@ class Blockchain {
         this.chain.push(Block.genesis())
 
     }
+    
     getLastBlock(){
         return this.chain[this.chain.length - 1]
     }
@@ -18,19 +19,30 @@ class Blockchain {
     }
 
     blockHash(block){
-        return SHA256(block.timestamp, block.lastHash, block.data).toString()
+        return SHA256(block.timestamp+block.lastHash+block.data).toString()
 
     }
 
     static isValidChain(chain){
+        const blocks = [...chain];
+        // genesis block should always stay the same
+        if(blocks[0].timestamp !== "today" || blocks[0].data !== "Genesis block" ) {
 
-        chain.forEach((block, index)=> {
+            return false;
+        }
+        blocks.shift();
+        const result = blocks.find((block,index) => block.hash !== Block.hash(block.timestamp,block.lastHash,block.data))
+        return result === undefined
 
-        })
+        
+        
 
     }
     // The longer chain wins
     replaceChain(chain) {
+        if(chain.length> this.chain.length) {
+            this.chain = chain
+        }
 
     }
 
@@ -38,5 +50,7 @@ class Blockchain {
 
 
 }
+
+
 
 module.exports = Blockchain
